@@ -1,0 +1,21 @@
+{
+  "name": "higgsfield-plugin",
+  "owner": {
+    "name": "Terry Chen",
+    "email": "zxtw17985321@gmail.com"
+  },
+  "metadata": {
+    "description": "Standalone Claude Code plugin for Higgsfield AI generation"
+  },
+  "plugins": [
+    {
+      "name": "higgsfield",
+      "source": ".",
+      "description": "Higgsfield AI image/video/3D/audio generation — official hosted remote MCP (OAuth) + 7 CLI-based skills",
+      "version": "1.0.0",
+      "author": {
+        "name": "Terry Chen"
+      }
+    }
+  ]
+}
