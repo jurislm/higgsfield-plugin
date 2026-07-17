@@ -6,7 +6,7 @@ Standalone Claude Code plugin for [Higgsfield AI](https://higgsfield.ai) image/v
 
 ```
 /plugin marketplace add jurislm/higgsfield-plugin
-/plugin install higgsfield-plugin@higgsfield
+/plugin install higgsfield@higgsfield-plugin
 /reload-plugins
 ```
 
