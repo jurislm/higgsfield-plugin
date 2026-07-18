@@ -53,4 +53,4 @@ Natural language routes to the matching skill automatically (e.g. "make me a pro
 
 ## License
 
-MIT — see `LICENSE`.
+MIT
