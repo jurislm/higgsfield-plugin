@@ -282,6 +282,7 @@
     font-family: var(--font-mono);
     font-size: 16px;
     margin: 0;
+    overflow-wrap: break-word;
   }
 
   .status-dot{
@@ -432,7 +433,7 @@
       <div class="mcp-panel">
         <div class="mcp-cell">
           <p class="k">Endpoint</p>
-          <p class="v">mcp.higgsfield.ai</p>
+          <p class="v">https://mcp.higgsfield.ai/mcp</p>
         </div>
         <div class="mcp-cell">
           <p class="k">Tools</p>
@@ -517,8 +518,19 @@
       ta.select();
       var ok = false;
       try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
-      document.body.removeChild(ta);
-      done(ok);
+
+      if (ok){
+        document.body.removeChild(ta);
+        done(true);
+        return;
+      }
+
+      // Leave the textarea visible and selected so the person can copy manually.
+      ta.readOnly = true;
+      ta.style.cssText = "position: static; opacity: 1; width: 100%; min-height: 5em; margin-top: 10px; font-family: inherit; font-size: 12px;";
+      ta.focus();
+      ta.select();
+      copyBtn.textContent = "select the commands above and press ⌘/ctrl+c";
     }
 
     if (navigator.clipboard && navigator.clipboard.writeText){

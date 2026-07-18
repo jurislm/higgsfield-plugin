@@ -75,18 +75,25 @@ gh api repos/jurislm/higgsfield-plugin/pages -X PUT -f "source[branch]=main" -f 
 - [ ] **Step 2: Poll build status until it's built, with a bounded loop and a hard timeout — fail fast on any terminal error status instead of continuing to Step 3:**
 
 ```bash
+set -euo pipefail
+built=false
 for i in $(seq 1 20); do
   status=$(gh api repos/jurislm/higgsfield-plugin/pages/builds/latest --jq '.status')
   echo "attempt $i: $status"
   case "$status" in
-    built) break ;;
+    built) built=true; break ;;
     errored) echo "Pages build errored — stop and inspect before verifying" >&2; exit 1 ;;
   esac
   sleep 15
 done
+
+if [ "$built" != true ]; then
+  echo "Pages build did not complete within the timeout" >&2
+  exit 1
+fi
 ```
 
-Expected: `built` within the 20 attempts (~5 minutes). If it's still not `built` after the loop, stop and investigate rather than proceeding to Step 3.
+Expected: `built` within the 20 attempts (~5 minutes). `set -euo pipefail` makes a failed `gh api` call abort the loop immediately instead of looping on empty status; the `built` flag plus final check stop the plan from proceeding to Step 3 on a timeout.
 
 - [ ] **Step 3: Verify the live URL loads and matches the local file** — fetch `https://jurislm.github.io/higgsfield-plugin/` in the Browser pane and confirm content matches `docs/index.html`.
 
