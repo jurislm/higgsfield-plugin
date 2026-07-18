@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>higgsfield-plugin — Higgsfield AI for Claude Code</title>
+<meta name="description" content="Standalone Claude Code plugin for Higgsfield AI image/video/3D/audio generation — official hosted remote MCP plus 7 CLI-based skills.">
+<style>
+  :root{
+    --paper: #E9EBEF;
+    --paper-2: #DCDFE6;
+    --ink: #14161A;
+    --ink-soft: #565B66;
+    --panel-dark: #14161A;
+    --panel-line: #2B2F38;
+    --panel-text: #D9DCE3;
+    --image: #FF6B4A;
+    --video: #3E7BFA;
+    --three-d: #8B5CF6;
+    --audio: #A8D64A;
+    --build: #8B92A1;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Consolas, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --max: 860px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ background: var(--paper); }
+
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+
+  a:focus-visible,
+  button:focus-visible{
+    outline: 2px solid var(--video);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .wrap{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Hero / terminal ---------- */
+
+  .hero{
+    padding: 72px 0 56px;
+  }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+  }
+
+  .terminal{
+    background: var(--panel-dark);
+    border: 1px solid var(--panel-line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -30px rgba(20,22,26,0.55);
+  }
+
+  .terminal-bar{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--panel-line);
+  }
+
+  .dot{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--panel-line);
+  }
+
+  .terminal-title{
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .terminal-body{
+    padding: 20px 20px 22px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--panel-text);
+    min-height: 108px;
+  }
+
+  .terminal-line{
+    white-space: pre;
+    min-height: 1.6em;
+  }
+
+  .terminal-line .prompt{ color: var(--audio); }
+
+  .cursor{
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--panel-text);
+    vertical-align: -2px;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink{ 50%{ opacity: 0; } }
+
+  .terminal-foot{
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 14px;
+    border-top: 1px solid var(--panel-line);
+  }
+
+  .copy-btn{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    background: transparent;
+    color: var(--panel-text);
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  .copy-btn:hover{ border-color: var(--panel-text); }
+
+  h1{
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: clamp(32px, 5.5vw, 46px);
+    letter-spacing: -0.01em;
+    margin: 34px 0 10px;
+  }
+
+  .tagline{
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin: 0 0 22px;
+  }
+
+  .hero-links{
+    display: flex;
+    gap: 20px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .hero-links a{
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+  }
+
+  /* ---------- Legend ---------- */
+
+  .legend{
+    padding: 8px 0 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .legend-item{ display: flex; align-items: center; gap: 8px; }
+
+  .swatch{
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex: none;
+  }
+
+  .swatch.image{ background: var(--image); }
+  .swatch.video{ background: var(--video); }
+  .swatch.three-d{ background: var(--three-d); }
+  .swatch.audio{ background: var(--audio); }
+  .swatch.build{ background: var(--build); }
+
+  /* ---------- Skills (man-page) ---------- */
+
+  section.skills{ padding: 8px 0 56px; }
+
+  .section-label{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--paper-2);
+    padding-bottom: 12px;
+    margin: 0 0 4px;
+  }
+
+  .skill-entry{
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 14px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--paper-2);
+    align-items: start;
+  }
+
+  .skill-entry:last-child{ border-bottom: none; }
+
+  .skill-tag{
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+    padding-top: 4px;
+  }
+
+  .skill-tag .swatch{ margin-bottom: 5px; }
+
+  .skill-name{
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .skill-desc{
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    max-width: 62ch;
+  }
+
+  /* ---------- MCP ---------- */
+
+  section.mcp{ padding: 8px 0 56px; }
+
+  .mcp-panel{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--paper-2);
+    border: 1px solid var(--paper-2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 18px;
+  }
+
+  .mcp-cell{
+    background: var(--paper);
+    padding: 18px 18px 16px;
+  }
+
+  .mcp-cell .k{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
+
+  .mcp-cell .v{
+    font-family: var(--font-mono);
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .status-dot{
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--audio);
+    margin-right: 7px;
+  }
+
+  .mcp-note{
+    margin: 14px 0 0;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    max-width: 62ch;
+  }
+
+  /* ---------- Footer ---------- */
+
+  footer{
+    border-top: 1px solid var(--paper-2);
+    padding: 26px 0 48px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  footer a{ text-decoration: underline; text-underline-offset: 2px; }
+
+  @media (max-width: 560px){
+    .hero{ padding-top: 48px; }
+    .mcp-panel{ grid-template-columns: 1fr; }
+    .hero-links{ gap: 16px; flex-wrap: wrap; }
+    .terminal-body{ font-size: 12.5px; }
+    .terminal-line{ white-space: pre-wrap; word-break: break-all; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Claude Code plugin</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="terminal-title">~/claude — higgsfield-plugin install</span>
+        </div>
+        <div class="terminal-body" id="terminalBody" aria-label="Install commands">
+          <div class="terminal-line"><span class="prompt">$</span> </div>
+          <div class="terminal-line"><span class="prompt">$</span> </div>
+          <div class="terminal-line"><span class="prompt">$</span> </div>
+        </div>
+        <div class="terminal-foot">
+          <button class="copy-btn" id="copyBtn" type="button">copy install commands</button>
+        </div>
+      </div>
+
+      <h1>higgsfield-plugin</h1>
+      <p class="tagline">Higgsfield AI image, video, 3D and audio generation, wired straight into Claude Code — the official hosted remote MCP plus 7 CLI-based skills.</p>
+
+      <div class="hero-links">
+        <a href="https://github.com/jurislm/higgsfield-plugin">Source on GitHub</a>
+        <a href="https://higgsfield.ai">Higgsfield AI</a>
+      </div>
+    </section>
+
+    <section class="legend" aria-label="Media type legend">
+      <span class="legend-item"><span class="swatch image"></span>image</span>
+      <span class="legend-item"><span class="swatch video"></span>video</span>
+      <span class="legend-item"><span class="swatch three-d"></span>3d</span>
+      <span class="legend-item"><span class="swatch audio"></span>audio</span>
+      <span class="legend-item"><span class="swatch build"></span>build (assembles the above)</span>
+    </section>
+
+    <section class="skills">
+      <p class="section-label">7 skills</p>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch image"></span><span class="swatch video" style="margin-left:2px"></span><span class="swatch three-d" style="margin-left:2px"></span><span class="swatch audio" style="margin-left:2px"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-generate</p>
+          <p class="skill-desc">General image/video/3D/audio generation, Marketing Studio, Virality Predictor.</p>
+        </div>
+      </div>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch image"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-product-photoshoot</p>
+          <p class="skill-desc">Branded product photography — studio, lifestyle, hero banner, and ad pack modes.</p>
+        </div>
+      </div>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch image"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-marketplace-cards</p>
+          <p class="skill-desc">E-commerce listing image sets — main image and A+ content modules.</p>
+        </div>
+      </div>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch image"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-soul-id</p>
+          <p class="skill-desc">Train a personalized Soul Character for consistent faces across generations.</p>
+        </div>
+      </div>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch video"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-video-explainer</p>
+          <p class="skill-desc">Full narrated explainer videos — storyboard, voice, and assembly.</p>
+        </div>
+      </div>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch build"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-game-generation</p>
+          <p class="skill-desc">Browser games and game-specific assets — sprites, textures, animated 3D characters, music, SFX.</p>
+        </div>
+      </div>
+
+      <div class="skill-entry">
+        <div class="skill-tag"><span class="swatch build"></span></div>
+        <div>
+          <p class="skill-name">higgsfield-websites</p>
+          <p class="skill-desc">Full-stack website scaffolding and deployment (React 19 + TanStack Start).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mcp">
+      <p class="section-label">MCP server</p>
+      <div class="mcp-panel">
+        <div class="mcp-cell">
+          <p class="k">Endpoint</p>
+          <p class="v">mcp.higgsfield.ai</p>
+        </div>
+        <div class="mcp-cell">
+          <p class="k">Tools</p>
+          <p class="v">70+</p>
+        </div>
+        <div class="mcp-cell">
+          <p class="k">Auth</p>
+          <p class="v"><span class="status-dot"></span>OAuth</p>
+        </div>
+      </div>
+      <p class="mcp-note">Official hosted remote MCP from Higgsfield. Claude Code triggers an OAuth login on first tool call — no API key to configure. The 7 skills above use a separate CLI login (<code>higgsfield auth login</code>).</p>
+    </section>
+
+    <footer>
+      <span>MIT License</span>
+      <span><a href="https://github.com/jurislm/higgsfield-plugin/blob/main/LICENSE">LICENSE</a></span>
+      <span><a href="https://github.com/jurislm/higgsfield-plugin">github.com/jurislm/higgsfield-plugin</a></span>
+    </footer>
+  </main>
+
+<script>
+(function(){
+  var lines = [
+    "/plugin marketplace add jurislm/higgsfield-plugin",
+    "/plugin install higgsfield@higgsfield-plugin",
+    "/reload-plugins"
+  ];
+
+  var body = document.getElementById("terminalBody");
+  var lineEls = body.querySelectorAll(".terminal-line");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function setStatic(){
+    lines.forEach(function(text, i){
+      lineEls[i].innerHTML = '<span class="prompt">$</span> ' + text;
+    });
+    var last = lineEls[lineEls.length - 1];
+    last.innerHTML += ' <span class="cursor"></span>';
+  }
+
+  if (reduceMotion){
+    setStatic();
+  } else {
+    var lineIndex = 0, charIndex = 0;
+
+    function typeStep(){
+      if (lineIndex >= lines.length) return;
+      var text = lines[lineIndex];
+      var el = lineEls[lineIndex];
+
+      if (charIndex <= text.length){
+        el.innerHTML = '<span class="prompt">$</span> ' + text.slice(0, charIndex) + '<span class="cursor"></span>';
+        charIndex++;
+        setTimeout(typeStep, 18 + Math.random() * 22);
+      } else {
+        el.innerHTML = '<span class="prompt">$</span> ' + text;
+        lineIndex++;
+        charIndex = 0;
+        setTimeout(typeStep, 260);
+      }
+    }
+
+    setTimeout(typeStep, 400);
+  }
+
+  var copyBtn = document.getElementById("copyBtn");
+  var copyText = lines.join("\n");
+
+  copyBtn.addEventListener("click", function(){
+    function done(ok){
+      copyBtn.textContent = ok ? "copied" : "press ⌘/ctrl+c to copy";
+      setTimeout(function(){ copyBtn.textContent = "copy install commands"; }, 1800);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(copyText).then(function(){ done(true); }, function(){ done(false); });
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = copyText;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      done(ok);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
