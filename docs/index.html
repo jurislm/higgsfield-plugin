@@ -94,7 +94,7 @@
     margin-left: 8px;
     font-family: var(--font-mono);
     font-size: 12px;
-    color: var(--ink-soft);
+    color: var(--build);
   }
 
   .terminal-body{
@@ -507,9 +507,7 @@
       setTimeout(function(){ copyBtn.textContent = "copy install commands"; }, 1800);
     }
 
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(copyText).then(function(){ done(true); }, function(){ done(false); });
-    } else {
+    function fallbackCopy(){
       var ta = document.createElement("textarea");
       ta.value = copyText;
       ta.style.position = "fixed";
@@ -521,6 +519,12 @@
       try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
       document.body.removeChild(ta);
       done(ok);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(copyText).then(function(){ done(true); }, fallbackCopy);
+    } else {
+      fallbackCopy();
     }
   });
 })();

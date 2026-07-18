@@ -42,5 +42,9 @@ respecting `prefers-color-scheme` if it's low-cost to support.
 
 ## Testing / verification
 
-No test framework applies (static HTML). Verification = open the built file in the
-Browser pane and visually confirm layout, links, and copy-to-clipboard work.
+No test framework applies (static HTML, no build step) — verify `docs/index.html`
+directly. Since the Browser pane can't navigate `file://` URLs and the Clipboard
+API needs a secure/HTTP context, serve `docs/` over local HTTP (e.g. `python3 -m
+http.server`) and open that in the Browser pane to visually confirm layout, links,
+and copy-to-clipboard behavior — then repeat the check against the deployed
+GitHub Pages HTTPS URL.

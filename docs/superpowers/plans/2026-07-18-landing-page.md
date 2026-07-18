@@ -36,11 +36,12 @@
   - MCP section: mention `https://mcp.higgsfield.ai/mcp`, "70+ tools", OAuth (no API key needed).
   - Footer: "MIT License", link to `LICENSE` in the repo, link to `https://higgsfield.ai`.
 
-- [ ] **Step 3: Open the file in the Browser pane (`mcp__Claude_Browser__preview_start` with the local file path, or `navigate` to the `file://` path) and visually verify:**
+- [ ] **Step 3: Serve `docs/` over local HTTP (e.g. `python3 -m http.server` in that directory) and open it in the Browser pane — the `file://` scheme isn't navigable via this tool, and the Clipboard API requires a secure/HTTP context anyway — then visually verify:**
   - All 7 skill cards render with correct names/descriptions.
-  - Copy-to-clipboard button works (click it, confirm clipboard content via `mcp__Claude_Browser__javascript_tool` reading `navigator.clipboard` or a visible "copied" state).
+  - Copy-to-clipboard button works (click it, then check `copyBtn.textContent` shows "copied"; separately verify the `execCommand` fallback path when the Clipboard API is unavailable or its permission is denied).
   - Links point to the correct URLs (repo, LICENSE, higgsfield.ai).
   - Page has no horizontal scroll/layout breakage at both desktop (1280px) and mobile (375px) widths — use `mcp__Claude_Browser__resize_window`.
+  - Repeat the clipboard check once more against the live `https://jurislm.github.io/higgsfield-plugin/` URL after Task 2 deploys it.
 
 - [ ] **Step 4: Commit**
 
@@ -71,13 +72,21 @@ If Pages is already enabled and this 409s, update instead:
 gh api repos/jurislm/higgsfield-plugin/pages -X PUT -f "source[branch]=main" -f "source[path]=/docs"
 ```
 
-- [ ] **Step 2: Poll build status until it's built:**
+- [ ] **Step 2: Poll build status until it's built, with a bounded loop and a hard timeout — fail fast on any terminal error status instead of continuing to Step 3:**
 
 ```bash
-gh api repos/jurislm/higgsfield-plugin/pages/builds/latest --jq '.status'
+for i in $(seq 1 20); do
+  status=$(gh api repos/jurislm/higgsfield-plugin/pages/builds/latest --jq '.status')
+  echo "attempt $i: $status"
+  case "$status" in
+    built) break ;;
+    errored) echo "Pages build errored — stop and inspect before verifying" >&2; exit 1 ;;
+  esac
+  sleep 15
+done
 ```
 
-Expected: eventually `"built"` (may take 1-2 minutes after enabling).
+Expected: `built` within the 20 attempts (~5 minutes). If it's still not `built` after the loop, stop and investigate rather than proceeding to Step 3.
 
 - [ ] **Step 3: Verify the live URL loads and matches the local file** — fetch `https://jurislm.github.io/higgsfield-plugin/` in the Browser pane and confirm content matches `docs/index.html`.
 
