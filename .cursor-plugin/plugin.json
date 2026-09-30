@@ -1,0 +1,22 @@
+{
+  "name": "higgsfield",
+  "description": "Higgsfield AI image/video/3D/audio generation \u2014 official hosted remote MCP (OAuth) + 7 CLI-based skills",
+  "version": "1.0.0",
+  "author": {
+    "name": "Terry Chen",
+    "url": "https://github.com/terry90918"
+  },
+  "homepage": "https://github.com/jurislm/higgsfield-plugin",
+  "repository": "https://github.com/jurislm/higgsfield-plugin",
+  "license": "MIT",
+  "keywords": [
+    "higgsfield",
+    "image-generation",
+    "video-generation",
+    "ai",
+    "mcp"
+  ],
+  "displayName": "Higgsfield Plugin",
+  "skills": "./skills/",
+  "mcpServers": "./.cursor-plugin/mcp.json"
+}

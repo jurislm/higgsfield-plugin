@@ -1,6 +1,6 @@
 # higgsfield-plugin
 
-Standalone Claude Code plugin for [Higgsfield AI](https://higgsfield.ai) image/video/3D/audio generation — the official hosted remote MCP (OAuth) plus 7 CLI-based skills.
+Portable plugin with existing Claude Code compatibility for [Higgsfield AI](https://higgsfield.ai) image/video/3D/audio generation — the official hosted remote MCP (OAuth) plus 7 CLI-based skills.
 
 ## Install
 
@@ -10,9 +10,26 @@ Standalone Claude Code plugin for [Higgsfield AI](https://higgsfield.ai) image/v
 /reload-plugins
 ```
 
+## Codex and Cursor
+
+```bash
+codex plugin marketplace add jurislm/higgsfield-plugin
+codex plugin add higgsfield@higgsfield-marketplace
+```
+
+For Cursor, import `https://github.com/jurislm/higgsfield-plugin` as a GitHub
+marketplace. The portable and host manifests select the same official remote
+MCP endpoint. OAuth is managed by the host; no API token or stdio launcher is
+stored in this package. Keep MCP OAuth and CLI login acceptance separate.
+
+Verify the selected repository plugin in a new ordinary host chat. Record its
+package version, remote server version when available, actual tool catalog and
+a read-only model query. An existing connector from another marketplace is not
+proof that this repository plugin has connected.
+
 ## Contents
 
-- MCP server: `https://mcp.higgsfield.ai/mcp` (Higgsfield's official hosted remote MCP, 70+ tools)
+- MCP server: `https://mcp.higgsfield.ai/mcp` (Higgsfield's official hosted remote MCP; discover the current tool catalog from the installed connection)
 - 7 skills, each a wrapper around the `higgsfield` CLI (`allowed-tools: Bash`):
   - `higgsfield-generate` — general image/video/3D/audio generation, Marketing Studio, Virality Predictor
   - `higgsfield-product-photoshoot` — branded product photography (studio/lifestyle/hero banner/ad pack modes)
@@ -34,7 +51,7 @@ The 7 skills call the `higgsfield` CLI (`npm install -g @higgsfield/cli`, or a s
 
 ## Source and license
 
-- The 7 skills are vendored as-is from the official [higgsfield-ai/skills](https://github.com/higgsfield-ai/skills) repo (MIT license). To pick up upstream updates, re-run `npx skills add higgsfield-ai/skills` and manually sync the `skills/` directory here — updates are not tracked automatically.
+- The 7 skills are vendored as-is from the official [higgsfield-ai/skills](https://github.com/higgsfield-ai/skills) repo (MIT license). To pick up upstream updates, re-run `npx skills add higgsfield-ai/skills` and manually sync the `skills/` directory here — the local snapshot is checked by `vendor/skills-provenance.json`. Its upstream revision is currently unknown, so hashes prove local integrity rather than upstream authenticity. After reviewing an intentional update, run `bun scripts/check.ts --write-provenance`.
 - MCP docs: <https://higgsfield.ai/mcp>
 - This repo itself: MIT license, see `LICENSE`.
 
@@ -54,3 +71,13 @@ Natural language routes to the matching skill automatically (e.g. "make me a pro
 ## License
 
 MIT
+
+## Development and release
+
+Run `bun install --frozen-lockfile` and `bun run check`. Checks validate portable
+and host manifests, version alignment and the vendored skill snapshot without
+connecting to Higgsfield or running its CLI. The Bun package is private and has
+no runtime entrypoint. Woodpecker performs source checks and Release Please
+manages Git versions/releases; no npm runtime is published.
+
+This repository follows [JurisLM Plugin Architecture v1](https://github.com/jurislm/woodpecker-ci-plugin/blob/main/docs/plugin-architecture.md).

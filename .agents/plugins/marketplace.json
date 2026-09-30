@@ -1,0 +1,16 @@
+{
+  "name": "higgsfield-marketplace",
+  "interface": {
+    "displayName": "Higgsfield Plugin"
+  },
+  "plugins": [
+    {
+      "name": "higgsfield",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "description": "Higgsfield AI image/video/3D/audio generation \u2014 official hosted remote MCP (OAuth) + 7 CLI-based skills"
+    }
+  ]
+}

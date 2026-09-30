@@ -1,0 +1,25 @@
+{
+  "name": "higgsfield-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.14",
+  "scripts": {
+    "manifest:check": "bun scripts/check.ts",
+    "package:check": "bun scripts/check.ts",
+    "lint": "bun ./node_modules/eslint/bin/eslint.js scripts tests --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test tests/check.test.ts",
+    "release:test": "bun test tests/release.test.ts",
+    "check": "bun run lint && bun run typecheck && bun run test && bun run release:test && bun run manifest:check"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.2",
+    "ajv": "8.20.0",
+    "typescript": "5.9.3",
+    "@eslint/js": "10.0.1",
+    "eslint": "10.11.0",
+    "typescript-eslint": "8.70.1",
+    "yaml": "2.9.1"
+  }
+}

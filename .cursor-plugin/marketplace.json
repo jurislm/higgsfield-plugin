@@ -1,0 +1,13 @@
+{
+  "name": "higgsfield-marketplace",
+  "owner": {
+    "name": "JurisLM"
+  },
+  "plugins": [
+    {
+      "name": "higgsfield",
+      "source": "./",
+      "description": "Higgsfield AI image/video/3D/audio generation \u2014 official hosted remote MCP (OAuth) + 7 CLI-based skills"
+    }
+  ]
+}
