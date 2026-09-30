@@ -3,6 +3,8 @@ labels:
 when:
   - event: push
     branch: main
+depends_on:
+  - ci
 steps:
   - name: github-release
     image: oven/bun:1.3.14

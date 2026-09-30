@@ -6,6 +6,7 @@ test("Git release workflow preserves source checks and does not publish an npm r
   expect(ci.steps.check.commands).toContain("bun install --frozen-lockfile");
   expect(ci.steps.check.commands).toContain("bun run check");
   const release = parse(await Bun.file(".woodpecker/release.yml").text());
+  expect(release.depends_on).toEqual(["ci"]);
   expect(release.when).toEqual([{ event: "push", branch: "main" }]);
   expect(release.steps.map((step: { name: string }) => step.name)).toEqual(["github-release", "release-pr"]);
   const text = JSON.stringify(release);
