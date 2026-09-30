@@ -1,7 +1,7 @@
 {
   "name": "higgsfield",
-  "description": "Higgsfield AI image/video/3D/audio generation \u2014 official hosted remote MCP (OAuth) + 7 CLI-based skills",
-  "version": "1.0.0",
+  "description": "Higgsfield AI image/video/3D/audio generation — official hosted remote MCP (OAuth) + 7 CLI-based skills",
+  "version": "1.1.0",
   "author": {
     "name": "Terry Chen",
     "url": "https://github.com/terry90918"
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "Higgsfield",
     "shortDescription": "Create media with Higgsfield.",
-    "longDescription": "Higgsfield AI image/video/3D/audio generation \u2014 official hosted remote MCP (OAuth) + 7 CLI-based skills",
+    "longDescription": "Higgsfield AI image/video/3D/audio generation — official hosted remote MCP (OAuth) + 7 CLI-based skills",
     "developerName": "JurisLM",
     "category": "Creative tools",
     "capabilities": [
